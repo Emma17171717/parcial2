@@ -1,1 +1,232 @@
-print("Eliana Hernandez - 02240132001")
+def crear_usuario(data):
+    print("\n-- Crear Usuario --")
+    uid = input("Ingrese ID del usuario: ").strip()
+    nombre = input("Nombre: ").strip()
+    identificacion = input("Identificación: ").strip()
+    email = input("Email: ").strip()
+    telefono = input("Teléfono: ").strip()
+    rol = input("Rol: ").strip()
+    contacto = (email, telefono)  # dupla
+    usuario = {
+        "id": uid,
+        "nombre": nombre,
+        "identificacion": identificacion,
+        "contacto": contacto,
+        "rol": rol
+    }
+    data["users"].append(usuario)
+    print("Usuario agregado.")
+
+def listar_usuarios(data):
+    print("\n-- Lista de Usuarios --")
+    for u in data["users"]:
+        email, tel = u["contacto"]
+        print(f"ID: {u['id']} | Nombre: {u['nombre']} | Identificación: {u['identificacion']} | Email: {email} | Tel: {tel} | Rol: {u['rol']}")
+    print("-- fin lista --")
+
+def consultar_usuario(data):
+    print("\n-- Consultar Usuario --")
+    uid = input("Ingrese ID: ").strip()
+    for u in data["users"]:
+        if u["id"] == uid:
+            email, tel = u["contacto"]
+            print(f"ID: {u['id']}")
+            print(f"Nombre: {u['nombre']}")
+            print(f"Identificación: {u['identificacion']}")
+            print(f"Email: {email}")
+            print(f"Teléfono: {tel}")
+            print(f"Rol: {u['rol']}")
+            return
+
+def actualizar_usuario(data):
+    print("\n-- Actualizar Usuario --")
+    uid = input("Ingrese ID a actualizar: ").strip()
+    for u in data["users"]:
+        if u["id"] == uid:
+            nuevo_nombre = input(f"Nuevo nombre (actual: {u['nombre']}): ").strip()
+            nueva_ident = input(f"Nueva identificación (actual: {u['identificacion']}): ").strip()
+            nuevo_email = input("Nuevo email (dejar en blanco para no cambiar): ").strip()
+            nuevo_tel = input("Nuevo teléfono (dejar en blanco para no cambiar): ").strip()
+            nuevo_rol = input(f"Nuevo rol (actual: {u['rol']}): ").strip()
+
+            if nuevo_nombre:
+                u["nombre"] = nuevo_nombre
+            if nueva_ident:
+                u["identificacion"] = nueva_ident
+
+            email_actual, tel_actual = u["contacto"]
+            email_final = nuevo_email if nuevo_email else email_actual
+            tel_final = nuevo_tel if nuevo_tel else tel_actual
+            u["contacto"] = (email_final, tel_final)
+            if nuevo_rol:
+                u["rol"] = nuevo_rol
+            return
+
+def eliminar_usuario(data):
+    print("\n-- Eliminar Usuario --")
+    uid = input("Ingrese ID a eliminar: ").strip()
+    for u in data["users"][:]:
+        if u["id"] == uid:
+            # eliminar tareas asociadas (si las hay)
+            for t in data["tasks"][:]:
+                if t["assigned_to"] == uid:
+                    data["tasks"].remove(t)
+            data["users"].remove(u)
+            return
+
+# TAREAS
+def crear_tarea(data):
+    print("\n-- Crear Tarea --")
+    tid = input("Ingrese ID de la tarea: ").strip()
+    title = input("Título: ").strip()
+    description = input("Descripción: ").strip()
+    assigned_to = input("ID del usuario asignado: ").strip()
+    status = input("Estado (por ejemplo: pendiente/completada): ").strip()
+    tarea = {
+        "id": tid,
+        "title": title,
+        "description": description,
+        "assigned_to": assigned_to,
+        "status": status
+    }
+    data["tasks"].append(tarea)
+    print("Tarea agregada.")
+
+def listar_tareas(data):
+    print("\n-- Lista de Tareas --")
+    for t in data["tasks"]:
+        print(f"ID: {t['id']} | Título: {t['title']} | Descripción: {t['description']} | Asignada a: {t['assigned_to']} | Estado: {t['status']}")
+    print("-- fin lista --")
+
+def consultar_tarea(data):
+    print("\n-- Consultar Tarea --")
+    tid = input("Ingrese ID: ").strip()
+    for t in data["tasks"]:
+        if t["id"] == tid:
+            print(f"ID: {t['id']}")
+            print(f"Título: {t['title']}")
+            print(f"Descripción: {t['description']}")
+            print(f"Asignada a: {t['assigned_to']}")
+            print(f"Estado: {t['status']}")
+            return
+
+def actualizar_tarea(data):
+    print("\n-- Actualizar Tarea --")
+    tid = input("Ingrese ID a actualizar: ").strip()
+    for t in data["tasks"]:
+        if t["id"] == tid:
+            nuevo_titulo = input(f"Nuevo título (actual: {t['title']}): ").strip()
+            nueva_desc = input(f"Nueva descripción (actual: {t['description']}): ").strip()
+            nuevo_assigned = input(f"Nuevo asignado (actual: {t['assigned_to']}): ").strip()
+            nuevo_estado = input(f"Nuevo estado (actual: {t['status']}): ").strip()
+
+            if nuevo_titulo:
+                t["title"] = nuevo_titulo
+            if nueva_desc:
+                t["description"] = nueva_desc
+            if nuevo_assigned:
+                t["assigned_to"] = nuevo_assigned
+            if nuevo_estado:
+                t["status"] = nuevo_estado
+            return
+
+def eliminar_tarea(data):
+    print("\n-- Eliminar Tarea --")
+    tid = input("Ingrese ID a eliminar: ").strip()
+    for t in data["tasks"][:]:
+        if t["id"] == tid:
+            data["tasks"].remove(t)
+            return
+
+def listar_tareas_por_usuario(data):
+    print("\n-- Tareas por Usuario --")
+    uid = input("Ingrese ID de usuario: ").strip()
+    for t in data["tasks"]:
+        if t["assigned_to"] == uid:
+            print(f"ID: {t['id']} | Título: {t['title']} | Estado: {t['status']}")
+    print("-- fin lista --")
+
+def reporte_total_por_estado(data):
+    totals = {}
+    for t in data["tasks"]:
+        est = t["status"]
+        totals[est] = totals.get(est, 0) + 1
+    print("\n-- Reporte por Estado --")
+    for estado, cantidad in totals.items():
+        print(f"{estado}: {cantidad}")
+    print("-- fin reporte --")
+
+# MENÚS
+def menu_usuario(data):
+    while True:
+        print("\n=== Menú Usuario ===")
+        print("1. Crear usuario")
+        print("2. Consultar usuario")
+        print("3. Actualizar usuario")
+        print("4. Eliminar usuario")
+        print("5. Listar usuarios")
+        print("0. Volver")
+        opcion = input("Opción: ").strip()
+        if opcion == "1":
+            crear_usuario(data)
+        elif opcion == "2":
+            consultar_usuario(data)
+        elif opcion == "3":
+            actualizar_usuario(data)
+        elif opcion == "4":
+            eliminar_usuario(data)
+        elif opcion == "5":
+            listar_usuarios(data)
+        elif opcion == "0":
+            break
+
+def menu_tareas(data):
+    while True:
+        print("\n=== Menú Tareas ===")
+        print("1. Crear tarea")
+        print("2. Consultar tarea")
+        print("3. Actualizar tarea")
+        print("4. Eliminar tarea")
+        print("5. Listar tareas")
+        print("6. Listar tareas por usuario")
+        print("7. Reporte por estado")
+        print("0. Volver")
+        opcion = input("Opción: ").strip()
+        if opcion == "1":
+            crear_tarea(data)
+        elif opcion == "2":
+            consultar_tarea(data)
+        elif opcion == "3":
+            actualizar_tarea(data)
+        elif opcion == "4":
+            eliminar_tarea(data)
+        elif opcion == "5":
+            listar_tareas(data)
+        elif opcion == "6":
+            listar_tareas_por_usuario(data)
+        elif opcion == "7":
+            reporte_total_por_estado(data)
+        elif opcion == "0":
+            break
+
+def main_menu():
+    data = {
+        "users": [],
+        "tasks": []
+    }
+    print("Sistema de control de tareas - modo interactivo (sin validaciones)")
+    while True:
+        print("\n=== Menú Principal ===")
+        print("1. Menú Usuario")
+        print("2. Menú Tareas")
+        print("0. Salir")
+        opcion = input("Opción: ").strip()
+        if opcion == "1":
+            menu_usuario(data)
+        elif opcion == "2":
+            menu_tareas(data)
+        elif opcion == "0":
+            break
+
+if __name__ == "__main__":
+    main_menu()
